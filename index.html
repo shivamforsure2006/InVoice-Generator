@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoicely - Modern Blue Invoice Generator</title>
+  <meta name="description" content="Generate, customize, save, download and print clean, modern blue and white invoices in seconds.">
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- html2pdf.js library for direct vector PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="app-body">
+  <!-- Top Application Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Invoicely<span class="brand-dot">.</span></span>
+          <span class="brand-subtitle">Modern Invoice Studio</span>
+        </div>
+      </div>
+
+      <!-- Center responsive view switcher on mobile/tablet -->
+      <div class="view-toggle-pills" id="viewTogglePills">
+        <button type="button" class="view-pill active" id="btnViewEditor">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          Editor
+        </button>
+        <button type="button" class="view-pill" id="btnViewPreview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          Preview
+        </button>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="header-actions">
+        <button type="button" class="btn btn-ghost" id="btnNewInvoice" title="Start with a blank or fresh invoice">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>New</span>
+        </button>
+
+        <button type="button" class="btn btn-ghost" id="btnLoadSample" title="Load realistic sample data">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          <span>Sample</span>
+        </button>
+
+        <button type="button" class="btn btn-outline" id="btnOpenSaved" title="View previously saved invoices">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Saved</span>
+          <span class="badge" id="savedCountBadge">0</span>
+        </button>
+
+        <button type="button" class="btn btn-primary" id="btnSaveInvoice" title="Save this invoice locally">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Save</span>
+        </button>
+
+        <button type="button" class="btn btn-outline" id="btnPrintInvoice" title="Print this invoice">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span>Print</span>
+        </button>
+
+        <button type="button" class="btn btn-accent" id="btnDownloadPDF" title="Download clean vector PDF">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Download PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace: Split Pane (Editor Left + Live Preview Right) -->
+  <main class="main-workspace">
+    
+    <!-- LEFT PANE: Form Builder & Invoice Controls -->
+    <section class="editor-pane" id="editorPane">
+      <div class="editor-scroll-container">
+        
+        <!-- Quick Template & Settings Bar -->
+        <div class="control-card template-selector-card">
+          <div class="control-header">
+            <span class="control-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              Invoice Style & Theme
+            </span>
+            <span class="badge badge-blue">Blue & White Edition</span>
+          </div>
+          <div class="template-options-grid">
+            <label class="template-radio-label active" data-template="modern-royal">
+              <input type="radio" name="invoiceTemplate" value="modern-royal" checked>
+              <div class="template-chip">
+                <span class="color-dot royal-dot"></span>
+                <span class="chip-text">Modern Royal</span>
+              </div>
+            </label>
+            <label class="template-radio-label" data-template="minimal-azure">
+              <input type="radio" name="invoiceTemplate" value="minimal-azure">
+              <div class="template-chip">
+                <span class="color-dot azure-dot"></span>
+                <span class="chip-text">Minimal Azure</span>
+              </div>
+            </label>
+            <label class="template-radio-label" data-template="executive-navy">
+              <input type="radio" name="invoiceTemplate" value="executive-navy">
+              <div class="template-chip">
+                <span class="color-dot navy-dot"></span>
+                <span class="chip-text">Executive Navy</span>
+              </div>
+            </label>
+            <label class="template-radio-label" data-template="tech-cobalt">
+              <input type="radio" name="invoiceTemplate" value="tech-cobalt">
+              <div class="template-chip">
+                <span class="color-dot cobalt-dot"></span>
+                <span class="chip-text">Tech Cobalt</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Section 1: Invoice Meta Details -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <div class="header-info">
+              <h3>Invoice Details</h3>
+              <p>Reference numbers, dates, currency, and invoice status</p>
+            </div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group col-4">
+              <label for="invNumber">Invoice Number *</label>
+              <div class="input-with-icon">
+                <span class="input-prefix">#</span>
+                <input type="text" id="invNumber" value="INV-2026-001" placeholder="INV-001" required>
+              </div>
+            </div>
+
+            <div class="form-group col-4">
+              <label for="invPoNumber">P.O. Number (Optional)</label>
+              <input type="text" id="invPoNumber" placeholder="e.g. PO-98421">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="invCurrency">Currency</label>
+              <select id="invCurrency">
+                <option value="USD" data-symbol="$" selected>USD ($) - US Dollar</option>
+                <option value="EUR" data-symbol="€">EUR (€) - Euro</option>
+                <option value="GBP" data-symbol="£">GBP (£) - British Pound</option>
+                <option value="INR" data-symbol="₹">INR (₹) - Indian Rupee</option>
+                <option value="CAD" data-symbol="CA$">CAD (CA$) - Canadian Dollar</option>
+                <option value="AUD" data-symbol="AU$">AUD (AU$) - Australian Dollar</option>
+                <option value="JPY" data-symbol="¥">JPY (¥) - Japanese Yen</option>
+                <option value="SGD" data-symbol="SG$">SGD (SG$) - Singapore Dollar</option>
+                <option value="AED" data-symbol="AED">AED (AED) - UAE Dirham</option>
+              </select>
+            </div>
+
+            <div class="form-group col-4">
+              <label for="invDate">Issue Date *</label>
+              <input type="date" id="invDate" required>
+            </div>
+
+            <div class="form-group col-4">
+              <label for="invDueDate">Due Date *</label>
+              <input type="date" id="invDueDate" required>
+            </div>
+
+            <div class="form-group col-4">
+              <label for="invStatus">Status</label>
+              <select id="invStatus">
+                <option value="DRAFT">Draft</option>
+                <option value="PENDING" selected>Pending Payment</option>
+                <option value="PAID">Paid in Full</option>
+                <option value="OVERDUE">Overdue</option>
+              </select>
+            </div>
+
+            <div class="form-group col-12 terms-quick-pills">
+              <span class="quick-pill-label">Quick Due Date Presets:</span>
+              <button type="button" class="pill-btn" data-days="0">Due on receipt</button>
+              <button type="button" class="pill-btn" data-days="7">Net 7</button>
+              <button type="button" class="pill-btn active" data-days="15">Net 15</button>
+              <button type="button" class="pill-btn" data-days="30">Net 30</button>
+              <button type="button" class="pill-btn" data-days="60">Net 60</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Sender (Your Business) Details -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="header-info">
+              <h3>Your Business Details (From)</h3>
+              <p>Your company or freelance identity, logo and contact</p>
+            </div>
+            <button type="button" class="btn btn-xs btn-ghost-blue" id="btnSaveDefaultBusiness" title="Save as default sender for new invoices">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path></svg>
+              Remember as Default
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <!-- Logo Upload Area -->
+            <div class="form-group col-12">
+              <label>Company Logo</label>
+              <div class="logo-upload-box" id="logoDropZone">
+                <div class="logo-preview-wrapper" id="logoPreviewWrapper" style="display: none;">
+                  <img src="" id="logoPreviewImg" alt="Company Logo Preview">
+                  <button type="button" class="btn-remove-logo" id="btnRemoveLogo" title="Remove logo">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+                <div class="logo-placeholder" id="logoPlaceholder">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <p><strong>Click to upload</strong> or drag and drop your logo</p>
+                  <span>PNG, JPG, SVG or WEBP (Max 2MB)</span>
+                  <input type="file" id="logoFileInput" accept="image/*" class="visually-hidden">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="senderName">Business / Freelancer Name *</label>
+              <input type="text" id="senderName" placeholder="e.g. Acme Studio LLC" required>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="senderTaxId">Tax ID / VAT / GST / EIN</label>
+              <input type="text" id="senderTaxId" placeholder="e.g. US987654321 / GSTIN29...">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="senderEmail">Email Address *</label>
+              <input type="email" id="senderEmail" placeholder="billing@acmestudio.com">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="senderPhone">Phone Number</label>
+              <input type="tel" id="senderPhone" placeholder="+1 (555) 234-5678">
+            </div>
+
+            <div class="form-group col-12">
+              <label for="senderAddress">Street Address</label>
+              <input type="text" id="senderAddress" placeholder="100 Innovation Way, Suite 400">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="senderCity">City</label>
+              <input type="text" id="senderCity" placeholder="San Francisco">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="senderState">State / Province / ZIP</label>
+              <input type="text" id="senderState" placeholder="CA 94105">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="senderCountry">Country</label>
+              <input type="text" id="senderCountry" placeholder="United States">
+            </div>
+
+            <div class="form-group col-12">
+              <label for="senderWebsite">Website (Optional)</label>
+              <input type="url" id="senderWebsite" placeholder="https://acmestudio.com">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Client (Bill To) Details -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <div class="header-info">
+              <h3>Client Details (Bill To)</h3>
+              <p>Recipient business or individual customer details</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group col-6">
+              <label for="clientCompany">Client Business / Organization *</label>
+              <input type="text" id="clientCompany" placeholder="e.g. Horizon Global Media" required>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="clientContact">Contact Person Name</label>
+              <input type="text" id="clientContact" placeholder="e.g. Sarah Jenkins (Procurement Lead)">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="clientEmail">Client Email *</label>
+              <input type="email" id="clientEmail" placeholder="accounts@horizonglobal.com">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="clientPhone">Client Phone</label>
+              <input type="tel" id="clientPhone" placeholder="+1 (555) 987-6543">
+            </div>
+
+            <div class="form-group col-12">
+              <label for="clientAddress">Billing Address</label>
+              <input type="text" id="clientAddress" placeholder="742 Evergreen Terrace, Floor 12">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="clientCity">City</label>
+              <input type="text" id="clientCity" placeholder="New York">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="clientState">State / ZIP</label>
+              <input type="text" id="clientState" placeholder="NY 10001">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="clientCountry">Country</label>
+              <input type="text" id="clientCountry" placeholder="United States">
+            </div>
+
+            <div class="form-group col-12">
+              <label for="clientTaxId">Client Tax / VAT ID (Optional)</label>
+              <input type="text" id="clientTaxId" placeholder="e.g. EU123456789">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Line Items & Services -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </div>
+            <div class="header-info">
+              <h3>Services & Items</h3>
+              <p>Add billable items, quantities, and rates</p>
+            </div>
+            <div class="header-actions-inline">
+              <select id="quickServiceSelect" class="select-sm">
+                <option value="">+ Add Preset Service...</option>
+                <option value="web-dev">Web Application Development</option>
+                <option value="ui-ux">UI/UX Interface Design</option>
+                <option value="brand">Brand Identity & Assets</option>
+                <option value="consulting">Technical Consulting (Hrs)</option>
+                <option value="seo">SEO & Performance Audit</option>
+                <option value="cloud">Cloud Infrastructure & Setup</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Item Rows Container -->
+          <div class="items-editor-table">
+            <div class="items-table-header">
+              <span class="col-desc">Description / Service</span>
+              <span class="col-qty">Qty</span>
+              <span class="col-price">Rate / Price</span>
+              <span class="col-total">Amount</span>
+              <span class="col-action"></span>
+            </div>
+            <div class="items-table-body" id="itemsTableBody">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="add-item-bar">
+            <button type="button" class="btn btn-outline-blue w-full" id="btnAddItem">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Line Item</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 5: Taxes, Discounts & Calculations -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <div class="header-info">
+              <h3>Taxes, Discounts & Total Adjustments</h3>
+              <p>Configure tax rates, discounts, shipping, and deposits</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group col-4">
+              <label for="taxRate">Tax Rate (%)</label>
+              <div class="input-with-icon">
+                <input type="number" id="taxRate" value="10" min="0" max="100" step="0.1">
+                <span class="input-suffix">%</span>
+              </div>
+            </div>
+
+            <div class="form-group col-4">
+              <label for="taxLabel">Tax Name / Label</label>
+              <input type="text" id="taxLabel" value="Sales Tax" placeholder="Tax, VAT, GST">
+            </div>
+
+            <div class="form-group col-4">
+              <label for="discountValue">Discount</label>
+              <div class="discount-input-group">
+                <input type="number" id="discountValue" value="0" min="0" step="0.1">
+                <select id="discountType">
+                  <option value="percent">%</option>
+                  <option value="flat">Fixed ($)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="shippingFee">Shipping / Handling Fee</label>
+              <div class="input-with-icon">
+                <span class="input-prefix" id="shippingCurrencyPrefix">$</span>
+                <input type="number" id="shippingFee" value="0" min="0" step="0.01">
+              </div>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="amountPaid">Amount Already Paid (Deposit)</label>
+              <div class="input-with-icon">
+                <span class="input-prefix" id="paidCurrencyPrefix">$</span>
+                <input type="number" id="amountPaid" value="0" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Payment Info, Notes & Signature -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="header-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </div>
+            <div class="header-info">
+              <h3>Payment Instructions & Notes</h3>
+              <p>Bank transfer details, client notes, and signature</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group col-6">
+              <label for="bankName">Bank Name</label>
+              <input type="text" id="bankName" placeholder="Chase Commercial Bank">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="bankAccount">Account Number / IBAN</label>
+              <input type="text" id="bankAccount" placeholder="1234 5678 9012 3456">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="bankRouting">Routing / SWIFT / BIC</label>
+              <input type="text" id="bankRouting" placeholder="CHASUS33">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="paymentNote">UPI / PayPal / Zelle (Optional)</label>
+              <input type="text" id="paymentNote" placeholder="payments@acmestudio.com">
+            </div>
+
+            <div class="form-group col-12">
+              <label for="clientNotes">Notes to Client</label>
+              <textarea id="clientNotes" rows="2" placeholder="Thank you for partnering with us! We appreciate your business."></textarea>
+            </div>
+
+            <div class="form-group col-12">
+              <label for="termsConditions">Terms & Conditions</label>
+              <textarea id="termsConditions" rows="2" placeholder="Payment is due within 15 days of invoice date. Late payments may be subject to a 1.5% monthly surcharge."></textarea>
+            </div>
+
+            <div class="form-group col-6">
+              <label for="signatureName">Authorized Signatory Name</label>
+              <input type="text" id="signatureName" placeholder="Alex Morgan">
+            </div>
+
+            <div class="form-group col-6">
+              <label for="signatureTitle">Signatory Title</label>
+              <input type="text" id="signatureTitle" placeholder="Managing Director">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: Interactive Real-Time Live Preview -->
+    <section class="preview-pane" id="previewPane">
+      <!-- Preview Sticky Toolbar -->
+      <div class="preview-toolbar">
+        <div class="toolbar-left">
+          <span class="preview-badge">
+            <span class="live-dot"></span> Live Document Preview
+          </span>
+          <span class="preview-paper-spec">A4 &bull; High Resolution Vector</span>
+        </div>
+        <div class="toolbar-right">
+          <div class="zoom-controls">
+            <button type="button" class="zoom-btn" id="btnZoomOut" title="Zoom out">-</button>
+            <span class="zoom-level" id="zoomLevelText">100%</span>
+            <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoom in">+</button>
+            <button type="button" class="zoom-btn" id="btnZoomReset" title="Reset Zoom">Fit</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-ghost" id="btnToggleBg" title="Toggle background backdrop">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Document Canvas Container -->
+      <div class="preview-canvas-wrapper" id="previewCanvasWrapper">
+        <div class="invoice-paper template-modern-royal" id="invoicePaper">
+          <!-- Live Document Body Generated and Updated dynamically -->
+          
+          <!-- Top Header Strip / Brand Banner -->
+          <div class="inv-header">
+            <div class="inv-brand-block">
+              <div class="inv-logo-container" id="docLogoContainer">
+                <!-- If logo uploaded, displays here; else default fallback -->
+                <div class="inv-logo-fallback" id="docLogoFallback">
+                  <span>AS</span>
+                </div>
+                <img src="" id="docLogoImg" alt="Business Logo" style="display: none;">
+              </div>
+              <div class="inv-sender-info">
+                <h1 class="inv-sender-name" id="docSenderName">Acme Studio LLC</h1>
+                <p class="inv-sender-address" id="docSenderAddress">100 Innovation Way, Suite 400<br>San Francisco, CA 94105, United States</p>
+                <div class="inv-sender-contact" id="docSenderContact">
+                  <span id="docSenderEmail">billing@acmestudio.com</span> &bull; <span id="docSenderPhone">+1 (555) 234-5678</span>
+                </div>
+                <div class="inv-sender-tax" id="docSenderTaxWrap">
+                  Tax ID: <span id="docSenderTax">US987654321</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="inv-meta-block">
+              <div class="inv-title-wrap">
+                <h2 class="inv-title">INVOICE</h2>
+                <div class="inv-status-pill status-pending" id="docStatusPill">Pending Payment</div>
+              </div>
+
+              <div class="inv-meta-grid">
+                <div class="meta-row">
+                  <span class="meta-label">Invoice Number:</span>
+                  <span class="meta-val meta-strong" id="docInvNumber">INV-2026-001</span>
+                </div>
+                <div class="meta-row" id="docPoRow">
+                  <span class="meta-label">P.O. Number:</span>
+                  <span class="meta-val" id="docPoNumber">PO-98421</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Date Issued:</span>
+                  <span class="meta-val" id="docDate">Oct 25, 2026</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Payment Due:</span>
+                  <span class="meta-val meta-due" id="docDueDate">Nov 09, 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider Accent -->
+          <div class="inv-accent-bar"></div>
+
+          <!-- Billing Info Cards (From & To) -->
+          <div class="inv-parties-section">
+            <div class="inv-party-card">
+              <div class="party-label">BILLED TO:</div>
+              <div class="party-name" id="docClientCompany">Horizon Global Media</div>
+              <div class="party-contact" id="docClientContact">Sarah Jenkins (Procurement Lead)</div>
+              <div class="party-address" id="docClientAddress">742 Evergreen Terrace, Floor 12<br>New York, NY 10001, United States</div>
+              <div class="party-extra" id="docClientExtra">
+                <div id="docClientEmailWrap">Email: <span id="docClientEmail">accounts@horizonglobal.com</span></div>
+                <div id="docClientPhoneWrap">Phone: <span id="docClientPhone">+1 (555) 987-6543</span></div>
+                <div id="docClientTaxWrap" style="display:none;">Tax ID: <span id="docClientTax"></span></div>
+              </div>
+            </div>
+
+            <div class="inv-party-card payment-summary-card">
+              <div class="party-label">PAYMENT OVERVIEW:</div>
+              <div class="summary-due-amount">
+                <span class="due-label">Total Amount Due</span>
+                <span class="due-figure" id="docHeaderTotal">$4,840.00</span>
+              </div>
+              <div class="summary-meta">
+                <div>Currency: <strong id="docCurrencyCode">USD</strong></div>
+                <div>Terms: <strong id="docTermsPreview">Net 15 Days</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <div class="inv-table-section">
+            <table class="inv-table">
+              <thead>
+                <tr>
+                  <th class="th-num">#</th>
+                  <th class="th-desc">Description / Service</th>
+                  <th class="th-qty">Qty</th>
+                  <th class="th-rate">Unit Price</th>
+                  <th class="th-total">Total</th>
+                </tr>
+              </thead>
+              <tbody id="docItemsTbody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Calculations & Summary Section -->
+          <div class="inv-bottom-grid">
+            <!-- Left Column: Payment Details & Notes -->
+            <div class="inv-notes-column">
+              <!-- Bank details box -->
+              <div class="inv-banking-box" id="docBankingBox">
+                <h4 class="box-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                  Payment Methods & Bank Details
+                </h4>
+                <div class="bank-grid">
+                  <div class="bank-row" id="docBankNameRow">
+                    <span class="b-label">Bank:</span>
+                    <span class="b-val" id="docBankName">Chase Commercial Bank</span>
+                  </div>
+                  <div class="bank-row" id="docBankAccountRow">
+                    <span class="b-label">Account/IBAN:</span>
+                    <span class="b-val" id="docBankAccount">1234 5678 9012 3456</span>
+                  </div>
+                  <div class="bank-row" id="docBankRoutingRow">
+                    <span class="b-label">SWIFT / Routing:</span>
+                    <span class="b-val" id="docBankRouting">CHASUS33</span>
+                  </div>
+                  <div class="bank-row" id="docPaymentNoteRow">
+                    <span class="b-label">Direct Pay:</span>
+                    <span class="b-val" id="docPaymentNote">payments@acmestudio.com</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Client Note -->
+              <div class="inv-note-box" id="docNoteBox">
+                <span class="note-label">Notes:</span>
+                <p id="docClientNoteText">Thank you for partnering with us! We appreciate your business.</p>
+              </div>
+
+              <!-- Terms Box -->
+              <div class="inv-terms-box" id="docTermsBox">
+                <span class="terms-label">Terms & Conditions:</span>
+                <p id="docTermsText">Payment is due within 15 days of invoice date. Late payments may be subject to a 1.5% monthly surcharge.</p>
+              </div>
+            </div>
+
+            <!-- Right Column: Financial Totals Breakdown -->
+            <div class="inv-totals-column">
+              <div class="totals-table">
+                <div class="total-row">
+                  <span class="t-label">Subtotal:</span>
+                  <span class="t-value" id="docSubtotal">$4,400.00</span>
+                </div>
+                <div class="total-row discount-row" id="docDiscountRow">
+                  <span class="t-label">Discount <span id="docDiscountRateText">(0%)</span>:</span>
+                  <span class="t-value" id="docDiscount">-$0.00</span>
+                </div>
+                <div class="total-row" id="docTaxRow">
+                  <span class="t-label"><span id="docTaxLabel">Sales Tax</span> (<span id="docTaxRate">10%</span>):</span>
+                  <span class="t-value" id="docTax">$440.00</span>
+                </div>
+                <div class="total-row" id="docShippingRow" style="display: none;">
+                  <span class="t-label">Shipping & Handling:</span>
+                  <span class="t-value" id="docShipping">$0.00</span>
+                </div>
+                
+                <div class="total-divider"></div>
+
+                <div class="total-row grand-total-row">
+                  <span class="t-label">Total Amount:</span>
+                  <span class="t-value" id="docGrandTotal">$4,840.00</span>
+                </div>
+
+                <div class="total-row paid-row" id="docPaidRow" style="display: none;">
+                  <span class="t-label">Amount Paid / Deposit:</span>
+                  <span class="t-value" id="docPaid">-$0.00</span>
+                </div>
+
+                <div class="total-row balance-due-row" id="docBalanceDueRow">
+                  <span class="t-label">Balance Due:</span>
+                  <span class="t-value" id="docBalanceDue">$4,840.00</span>
+                </div>
+              </div>
+
+              <!-- Authorized Signatory section -->
+              <div class="inv-signature-block">
+                <div class="signature-line">
+                  <span class="signature-handwritten" id="docSignatureHandwritten">Alex Morgan</span>
+                </div>
+                <div class="signature-info">
+                  <div class="sig-name" id="docSigName">Alex Morgan</div>
+                  <div class="sig-title" id="docSigTitle">Managing Director</div>
+                  <div class="sig-auth">Authorized Signature</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Footer -->
+          <div class="inv-footer">
+            <div class="footer-left">
+              <span>Questions? Contact us at <strong id="docFooterEmail">billing@acmestudio.com</strong></span>
+            </div>
+            <div class="footer-right">
+              <span>Page 1 of 1 &bull; Generated with Invoicely</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SAVED INVOICES SLIDE DRAWER -->
+  <div class="drawer-overlay" id="savedDrawerOverlay"></div>
+  <aside class="saved-drawer" id="savedDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+        <h3>Saved Invoices</h3>
+      </div>
+      <button type="button" class="btn-close-drawer" id="btnCloseDrawer" title="Close drawer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <div class="drawer-search-bar">
+      <div class="search-input-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="savedSearchInput" placeholder="Search by invoice # or client name...">
+      </div>
+    </div>
+
+    <div class="drawer-filters">
+      <button type="button" class="filter-chip active" data-filter="ALL">All</button>
+      <button type="button" class="filter-chip" data-filter="PAID">Paid</button>
+      <button type="button" class="filter-chip" data-filter="PENDING">Pending</button>
+      <button type="button" class="filter-chip" data-filter="DRAFT">Draft</button>
+    </div>
+
+    <div class="drawer-list" id="savedInvoicesList">
+      <!-- Saved item cards injected by JS -->
+    </div>
+
+    <div class="drawer-footer">
+      <button type="button" class="btn btn-sm btn-outline" id="btnExportAllData">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Export Backup
+      </button>
+      <label class="btn btn-sm btn-ghost" title="Import JSON backup">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Import Backup
+        <input type="file" id="importBackupInput" accept=".json" class="visually-hidden">
+      </label>
+    </div>
+  </aside>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/pdf-export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
